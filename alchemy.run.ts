@@ -309,6 +309,9 @@ export default Alchemy.Stack(
     const authMode = yield* Config.string("AUTH_MODE").pipe(
       Config.withDefault("cloudflare_access"),
     );
+    const cloudflareWorkersPaid = yield* Config.boolean(
+      "CLOUDFLARE_WORKERS_PAID",
+    ).pipe(Config.withDefault(false));
     const databaseProvider = yield* optionalVar("DATABASE_PROVIDER");
     const workersSubdomain = yield* readWorkersSubdomain({ required: false });
 
@@ -374,10 +377,9 @@ export default Alchemy.Stack(
       // Site audits parse and persist batches of HTML inside Workflow steps.
       // Paid Workers permit up to five minutes; keep headroom for unusually
       // link-heavy sites after bounding page bodies and bulk-writing links.
-      // Configurable CPU limits are a paid-plan feature, and self-host
-      // deploys (cloudflare_access) may run on the free plan — which rejects
-      // them — so those get the plan default instead.
-      ...(authMode === "cloudflare_access"
+      // Configurable CPU limits are a paid-plan feature. Self-host deployments
+      // omit the limit unless the operator explicitly confirms a paid account.
+      ...(authMode === "cloudflare_access" && !cloudflareWorkersPaid
         ? {}
         : { limits: { cpuMs: 300_000 } }),
       observability: {
