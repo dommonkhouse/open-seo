@@ -1,3 +1,4 @@
+import { isHostedClientAuthMode } from "@/lib/auth-mode";
 import { GA4_OAUTH_APP_PENDING } from "@/shared/ga4";
 
 type McpTool = {
@@ -209,7 +210,8 @@ const toolCategories: ToolCategory[] = [
   },
 ];
 
-const visibleCategories = GA4_OAUTH_APP_PENDING
+const hideGa4Tools = GA4_OAUTH_APP_PENDING && isHostedClientAuthMode();
+const visibleCategories = hideGa4Tools
   ? toolCategories.filter((cat) => cat.label !== "Google Analytics")
   : toolCategories;
 

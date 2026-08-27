@@ -26,6 +26,7 @@ import {
   refreshDashboardBacklinkSnapshot,
 } from "@/serverFunctions/dashboard";
 import { setProjectDomain } from "@/serverFunctions/projects";
+import { isHostedClientAuthMode } from "@/lib/auth-mode";
 import { GA4_OAUTH_APP_PENDING } from "@/shared/ga4";
 import type { DashboardHeroStep } from "@/types/schemas/dashboard";
 
@@ -301,6 +302,14 @@ export function DashboardPage({ projectId }: { projectId: string }) {
   const showBacklinks = activation.domain !== null;
   const gscConnected = activation.gsc.connected;
   const ga4Connected = activation.ga4.connected;
+  // Hosted OAuth is still awaiting Google approval, so hide the unconnected
+  // connect pitch there. Self-hosted (and already-connected projects) keep the
+  // card visible — Settings already does this; the dashboard was over-gated.
+  const hideGa4ConnectPitch =
+    GA4_OAUTH_APP_PENDING && isHostedClientAuthMode();
+  const showGa4Card =
+    ga4Connected ||
+    (!hideGa4ConnectPitch && !activation.ga4.cardDismissedAt);
 
   return (
     <div className="px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
@@ -336,8 +345,7 @@ export function DashboardPage({ projectId }: { projectId: string }) {
               hasData: gscConnected,
               node: <GscCard projectId={projectId} connected={gscConnected} />,
             },
-            ...(!GA4_OAUTH_APP_PENDING &&
-            (ga4Connected || !activation.ga4.cardDismissedAt)
+            ...(showGa4Card
               ? [
                   {
                     key: "ga4",
