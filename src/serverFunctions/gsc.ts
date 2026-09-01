@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { waitUntil } from "cloudflare:workers";
+import { env, waitUntil } from "cloudflare:workers";
 import { z } from "zod";
 import { GscService } from "@/server/features/gsc/services/GscService";
 import { hasSelfHostedGoogleOAuthConfig } from "@/server/features/google/oauth-config";
@@ -133,7 +133,7 @@ export const startSelfHostedGscLink = createServerFn({ method: "POST" })
   .middleware(requireAuthenticatedContext)
   .validator(startSelfHostedLinkSchema)
   .handler(async ({ data, context }) => {
-    const publicOrigin = getPublicOrigin(getRequest());
+    const publicOrigin = getPublicOrigin(getRequest(), env.BETTER_AUTH_URL);
     const url = await createSelfHostedGoogleAuthorizationUrl({
       integration: GSC_INTEGRATION,
       user: {

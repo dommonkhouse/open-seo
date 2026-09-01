@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
-import { waitUntil } from "cloudflare:workers";
+import { env, waitUntil } from "cloudflare:workers";
 import { z } from "zod";
 import { Ga4Service } from "@/server/features/ga4/services/Ga4Service";
 import { hasSelfHostedGoogleOAuthConfig } from "@/server/features/google/oauth-config";
@@ -126,6 +126,6 @@ export const startSelfHostedGa4Link = createServerFn({ method: "POST" })
         userEmail: context.userEmail,
       },
       callbackURL: data.callbackURL,
-      publicOrigin: getPublicOrigin(getRequest()),
+      publicOrigin: getPublicOrigin(getRequest(), env.BETTER_AUTH_URL),
     }),
   }));

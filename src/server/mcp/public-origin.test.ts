@@ -15,7 +15,18 @@ describe("getPublicOrigin", () => {
     );
   });
 
-  it("falls back to the request origin without proxy headers", () => {
+  it("uses the configured deployed origin instead of a loopback request", () => {
+    const request = new Request("http://127.0.0.1:3000/api/gsc/oauth/start");
+
+    expect(
+      getPublicOrigin(
+        request,
+        "https://open-seo-selfhost.dom-5d1.workers.dev",
+      ),
+    ).toBe("https://open-seo-selfhost.dom-5d1.workers.dev");
+  });
+
+  it("falls back to the request origin without proxy headers or config", () => {
     const request = new Request("http://localhost:3102/api/oauth/consent");
 
     expect(getPublicOrigin(request)).toBe("http://localhost:3102");
