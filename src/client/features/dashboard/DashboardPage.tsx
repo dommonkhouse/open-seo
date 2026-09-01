@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import { captureClientEvent } from "@/client/lib/posthog";
+import { Ga4ConnectCard } from "@/client/features/dashboard/Ga4ConnectCard";
 import {
   computeNextStep,
   isStepDone,
@@ -15,6 +16,7 @@ import {
   GscCard,
 } from "@/client/features/dashboard/DashboardCards";
 import { McpConnectCard } from "@/client/features/dashboard/McpConnectCard";
+import { WorkspaceMergeBanner } from "@/client/features/dashboard/WorkspaceMergeBanner";
 import { getStandardErrorMessage } from "@/client/lib/error-messages";
 import type { DashboardActivation } from "@/server/features/dashboard/services/DashboardService";
 import {
@@ -24,6 +26,8 @@ import {
   refreshDashboardBacklinkSnapshot,
 } from "@/serverFunctions/dashboard";
 import { setProjectDomain } from "@/serverFunctions/projects";
+import { isHostedClientAuthMode } from "@/lib/auth-mode";
+import { GA4_OAUTH_APP_PENDING } from "@/shared/ga4";
 import type { DashboardHeroStep } from "@/types/schemas/dashboard";
 
 const HERO_COPY: Record<
@@ -297,11 +301,22 @@ export function DashboardPage({ projectId }: { projectId: string }) {
 
   const showBacklinks = activation.domain !== null;
   const gscConnected = activation.gsc.connected;
+  const ga4Connected = activation.ga4.connected;
+  // Hosted OAuth is still awaiting Google approval, so hide the unconnected
+  // connect pitch there. Self-hosted (and already-connected projects) keep the
+  // card visible — Settings already does this; the dashboard was over-gated.
+  const hideGa4ConnectPitch =
+    GA4_OAUTH_APP_PENDING && isHostedClientAuthMode();
+  const showGa4Card =
+    ga4Connected ||
+    (!hideGa4ConnectPitch && !activation.ga4.cardDismissedAt);
 
   return (
     <div className="px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">
       <div className="mx-auto flex max-w-5xl flex-col gap-5">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
+
+        <WorkspaceMergeBanner />
 
         <OnboardingChecklist projectId={projectId} activation={activation} />
 
@@ -330,6 +345,20 @@ export function DashboardPage({ projectId }: { projectId: string }) {
               hasData: gscConnected,
               node: <GscCard projectId={projectId} connected={gscConnected} />,
             },
+            ...(showGa4Card
+              ? [
+                  {
+                    key: "ga4",
+                    hasData: ga4Connected,
+                    node: (
+                      <Ga4ConnectCard
+                        projectId={projectId}
+                        connected={ga4Connected}
+                      />
+                    ),
+                  },
+                ]
+              : []),
             {
               key: "audit",
               hasData: overview?.audit != null,

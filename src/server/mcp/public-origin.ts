@@ -7,10 +7,19 @@ function getForwardedProtocol(request: Request) {
   return protocol === "http" || protocol === "https" ? protocol : null;
 }
 
-export function getPublicOrigin(request: Request) {
+export function getPublicOrigin(
+  request: Request,
+  configuredOrigin?: string | null,
+) {
   const url = new URL(request.url);
   if (url.protocol === "https:") {
     return url.origin;
+  }
+
+  if (configuredOrigin) {
+    try {
+      return new URL(configuredOrigin).origin;
+    } catch {}
   }
 
   const protocol = getForwardedProtocol(request);
