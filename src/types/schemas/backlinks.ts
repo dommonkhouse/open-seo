@@ -31,7 +31,7 @@ export function normalizeBacklinksSpamFilterOptions(
       : undefined,
   };
 }
-export const backlinksLookupSchema = z.object({
+const backlinksLookupSchema = z.object({
   target: z.string().min(1, "Target is required").max(2048),
   scope: backlinksTargetScopeSchema.optional(),
 });
@@ -86,7 +86,7 @@ export const backlinksRowsFiltersSchema = z.object({
  */
 export const backlinksRowsModeSchema = z.enum(["one_per_domain", "as_is"]);
 
-export const referringDomainsFiltersSchema = z.object({
+const referringDomainsFiltersSchema = z.object({
   include: z.string().optional(),
   exclude: z.string().optional(),
   minBacklinks: optionalNumber,
@@ -97,7 +97,7 @@ export const referringDomainsFiltersSchema = z.object({
   maxSpamScore: optionalNumber,
 });
 
-export const topPagesFiltersSchema = z.object({
+const topPagesFiltersSchema = z.object({
   include: z.string().optional(),
   exclude: z.string().optional(),
   minBacklinks: optionalNumber,

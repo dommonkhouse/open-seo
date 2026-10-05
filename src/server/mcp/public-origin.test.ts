@@ -19,10 +19,7 @@ describe("getPublicOrigin", () => {
     const request = new Request("http://127.0.0.1:3000/api/gsc/oauth/start");
 
     expect(
-      getPublicOrigin(
-        request,
-        "https://open-seo-selfhost.dom-5d1.workers.dev",
-      ),
+      getPublicOrigin(request, "https://open-seo-selfhost.dom-5d1.workers.dev"),
     ).toBe("https://open-seo-selfhost.dom-5d1.workers.dev");
   });
 

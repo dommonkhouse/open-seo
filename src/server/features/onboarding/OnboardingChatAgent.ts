@@ -4,7 +4,6 @@ import {
   stepCountIs,
   streamText,
   type StreamTextOnFinishCallback,
-  type ToolSet,
 } from "ai";
 import type { OnChatMessageOptions } from "@cloudflare/ai-chat";
 import { ProjectRepository } from "@/server/features/projects/repositories/ProjectRepository";
@@ -106,7 +105,7 @@ export class OnboardingChatAgent extends AIChatAgent {
   }
 
   async onChatMessage(
-    onFinish: StreamTextOnFinishCallback<ToolSet>,
+    onFinish: StreamTextOnFinishCallback,
     options?: OnChatMessageOptions,
   ): Promise<Response | undefined> {
     const project = await ProjectRepository.getProjectById(this.name);

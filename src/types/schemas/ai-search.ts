@@ -237,7 +237,7 @@ export type PromptExplorerModelResult = z.infer<
   typeof promptExplorerModelResultSchema
 >;
 
-export const promptExplorerResultSchema = z.object({
+const promptExplorerResultSchema = z.object({
   prompt: z.string(),
   highlightBrand: z.string().nullable(),
   fetchedAt: z.string(),

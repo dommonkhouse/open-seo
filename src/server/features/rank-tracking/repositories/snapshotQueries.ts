@@ -144,7 +144,7 @@ export async function getPositionMatrix(
  * No keywordIds needed — scoped to the config via a completed-runs subquery,
  * so subset runs are included automatically.
  */
-export async function getSnapshotsForConfig(
+async function getSnapshotsForConfig(
   configId: string,
   opts: { beforeDate?: string; order: "latest" | "earliest" },
 ) {

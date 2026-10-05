@@ -5,7 +5,7 @@ import {
 import { Ga4MalformedResponseError } from "@/server/lib/ga4Errors";
 
 type Ga4QuotaStatus = { consumed: number; remaining: number };
-export type Ga4Quota = {
+type Ga4Quota = {
   tokensPerDay?: Ga4QuotaStatus;
   tokensPerHour?: Ga4QuotaStatus;
   concurrentRequests?: Ga4QuotaStatus;
@@ -14,7 +14,7 @@ export type Ga4Quota = {
   tokensPerProjectPerHour?: Ga4QuotaStatus;
 };
 
-export type Ga4ReportMetadata = {
+type Ga4ReportMetadata = {
   dataLossFromOtherRow: boolean;
   subjectToThresholding: boolean;
   sampling: Array<{

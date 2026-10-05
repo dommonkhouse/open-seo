@@ -40,7 +40,7 @@ export type BacklinksSearchState = {
   view?: "all";
 };
 
-export type BacklinksNavigate = (args: {
+type BacklinksNavigate = (args: {
   search: (prev: Record<string, unknown>) => Record<string, unknown>;
   replace: boolean;
 }) => void;

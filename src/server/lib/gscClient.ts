@@ -21,7 +21,7 @@ export type GscSearchAnalyticsRow = {
   position: number;
 };
 
-export type GscDimensionFilter = {
+type GscDimensionFilter = {
   dimension: string;
   operator: string;
   expression: string;

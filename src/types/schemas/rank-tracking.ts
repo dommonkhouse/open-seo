@@ -91,7 +91,7 @@ export const triggerCheckSchema = z.object({
   keywordIds: z.array(z.string().uuid()).max(2000).optional(),
 });
 
-export const comparePeriodSchema = z.enum(["1d", "7d", "30d", "90d"]);
+const comparePeriodSchema = z.enum(["1d", "7d", "30d", "90d"]);
 export type ComparePeriod = z.infer<typeof comparePeriodSchema>;
 
 export const getLatestResultsSchema = z.object({
