@@ -1,3 +1,5 @@
 minimumReleaseAge: 11520
 minimumReleaseAgeExclude:
+  # Approved security release exception; published 2026-09-30.
+  - "source-map-js@1.2.2"
   - "@every-app/*"

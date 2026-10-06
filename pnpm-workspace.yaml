@@ -1,5 +1,7 @@
 minimumReleaseAge: 11520
 minimumReleaseAgeExclude:
+  # Approved security release exception; published 2026-09-30.
+  - "source-map-js@1.2.2"
   - "@every-app/*"
   # TEMPORARY (remove after 2026-08-15): workers-oauth-provider 0.10.2 was
   # published 2026-08-07; needed for the MCP SDK v2 migration plus the
@@ -68,3 +70,7 @@ overrides:
   esbuild: ">=0.28.2 <1"
   dataforseo-client: "2.0.19"
   recharts: "3.7.0"
+  # GHSA-68fv-2mgg-jv7q
+  source-map-js: "^1.2.2"
+  # GHSA-p6vx-979v-rg4c and GHSA-jp82-f5mq-hwhp
+  seroval: "^1.6.3"
