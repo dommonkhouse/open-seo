@@ -29,7 +29,7 @@ const AUDIT_ERROR_CODES = [
   "unknown",
 ] as const;
 
-export type AuditErrorCode = (typeof AUDIT_ERROR_CODES)[number];
+type AuditErrorCode = (typeof AUDIT_ERROR_CODES)[number];
 
 export interface AuditErrorInfo {
   errorCode: AuditErrorCode;

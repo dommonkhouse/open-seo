@@ -5,7 +5,7 @@ export const MAX_KEYWORDS_PER_SUBMIT = 5;
 export type ResultLimit = 150 | 300 | 500;
 export const RESULT_LIMITS: ResultLimit[] = [150, 300, 500];
 
-export type KeywordSource = "related" | "suggestions" | "ideas";
+type KeywordSource = "related" | "suggestions" | "ideas";
 export type KeywordMode = "auto" | KeywordSource;
 /** Actual result source; google_ads serves countries Labs doesn't cover. */
 export type ResearchSource = KeywordSource | "google_ads";

@@ -43,5 +43,11 @@
     "typescript": "^5.9.3",
     "vite-tsconfig-paths": "^6.0.5",
     "wrangler": "^4.67.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "undici": ">=7.29.1 <8",
+      "esbuild": ">=0.28.1"
+    }
   }
 }

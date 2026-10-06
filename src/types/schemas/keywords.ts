@@ -147,7 +147,7 @@ export const refreshSavedKeywordMetricsSchema = z.object({
   projectId: z.string().min(1),
 });
 
-export type ResearchKeywordsInput = z.infer<typeof researchKeywordsSchema>;
+type ResearchKeywordsInput = z.infer<typeof researchKeywordsSchema>;
 export type SaveKeywordsInput = z.infer<typeof saveKeywordsSchema>;
 type ResolvedMarket = { locationCode: number; languageCode: string };
 export type ResolvedResearchKeywordsInput = Omit<

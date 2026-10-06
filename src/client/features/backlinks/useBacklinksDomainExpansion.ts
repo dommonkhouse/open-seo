@@ -6,7 +6,7 @@ import type { BacklinksRow, BacklinksSearchState } from "./backlinksPageTypes";
 const DOMAIN_LINKS_PAGE_SIZE = 100;
 const DOMAIN_LINKS_STALE_TIME_MS = 5 * 60 * 1000;
 
-export type BacklinksDomainEntry =
+type BacklinksDomainEntry =
   | { status: "loading" }
   | { status: "error" }
   | { status: "ready"; rows: BacklinksRow[] };

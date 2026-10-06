@@ -48,7 +48,7 @@ const classifyBacklinksError = createDataforseoBillingClassifier({
 
 // DataForSEO ships both the misspelled (`*_reffering_*`) and corrected keys; we
 // accept both via passthrough so callers can read whichever is present.
-export const backlinksSummaryItemSchema = z
+const backlinksSummaryItemSchema = z
   .object({
     target: z.string().optional(),
     rank: z.number().nullable().optional(),
@@ -72,7 +72,7 @@ export const backlinksSummaryItemSchema = z
   })
   .passthrough();
 
-export const backlinksItemSchema = z
+const backlinksItemSchema = z
   .object({
     domain_from: z.string().nullable().optional(),
     url_from: z.string().nullable().optional(),
@@ -97,7 +97,7 @@ export const backlinksItemSchema = z
   })
   .passthrough();
 
-export const referringDomainItemSchema = z
+const referringDomainItemSchema = z
   .object({
     domain: z.string().nullable().optional(),
     backlinks: z.number().nullable().optional(),
@@ -111,7 +111,7 @@ export const referringDomainItemSchema = z
   })
   .passthrough();
 
-export const domainPageSummaryItemSchema = z
+const domainPageSummaryItemSchema = z
   .object({
     page: z.string().nullable().optional(),
     url: z.string().nullable().optional(),
@@ -122,7 +122,7 @@ export const domainPageSummaryItemSchema = z
   })
   .passthrough();
 
-export const backlinksHistoryItemSchema = z
+const backlinksHistoryItemSchema = z
   .object({
     date: z.string().nullable().optional(),
     rank: z.number().nullable().optional(),

@@ -305,11 +305,9 @@ export function DashboardPage({ projectId }: { projectId: string }) {
   // Hosted OAuth is still awaiting Google approval, so hide the unconnected
   // connect pitch there. Self-hosted (and already-connected projects) keep the
   // card visible — Settings already does this; the dashboard was over-gated.
-  const hideGa4ConnectPitch =
-    GA4_OAUTH_APP_PENDING && isHostedClientAuthMode();
+  const hideGa4ConnectPitch = GA4_OAUTH_APP_PENDING && isHostedClientAuthMode();
   const showGa4Card =
-    ga4Connected ||
-    (!hideGa4ConnectPitch && !activation.ga4.cardDismissedAt);
+    ga4Connected || (!hideGa4ConnectPitch && !activation.ga4.cardDismissedAt);
 
   return (
     <div className="px-4 py-4 pb-24 md:px-6 md:py-6 md:pb-8">

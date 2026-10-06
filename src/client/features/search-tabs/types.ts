@@ -10,7 +10,7 @@ export type BacklinksSearchTabInput = {
   scope: BacklinksTargetScope;
 };
 
-export type DomainSearchTabInput = {
+type DomainSearchTabInput = {
   type: "domain";
   domain: string;
   subdomains: boolean;
