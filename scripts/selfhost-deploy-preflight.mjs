@@ -49,7 +49,7 @@ if (!env.DATAFORSEO_API_KEY) {
   );
 }
 // When both are set, the deploy provisions no Access resources (hand-managed
-// application) and needs neither ACCESS_ALLOWED_EMAILS nor the access:write
+// application) and needs neither ACCESS_ALLOWED_EMAILS nor the access.write
 // login scope.
 const managedAccess = !(env.TEAM_DOMAIN && env.POLICY_AUD);
 if (managedAccess && !env.ACCESS_ALLOWED_EMAILS) {
@@ -74,22 +74,22 @@ if (!process.env.CLOUDFLARE_API_TOKEN) {
   if (!cloudflare) {
     fail(
       `No Cloudflare login found (alchemy profile "${profileName}") — run ${cmd("pnpm alchemy login")}`,
-      `first (answer yes to "Customize OAuth scopes?" and enable ${em("access:write")}).`,
+      `first (answer yes to "Customize OAuth scopes?" and enable ${em("access.write")}).`,
     );
   }
   if (
     managedAccess &&
     cloudflare.method === "oauth" &&
     Array.isArray(cloudflare.scopes) &&
-    !cloudflare.scopes.includes("access:write")
+    !cloudflare.scopes.includes("access.write")
   ) {
     fail(
-      `Your Cloudflare login is missing the ${em("access:write")} scope, which the deploy needs`,
+      `Your Cloudflare login is missing the ${em("access.write")} scope, which the deploy needs`,
       "to provision the Cloudflare Access login gate. Log in again with the scope enabled:",
       "",
       `  ${cmd("pnpm alchemy login --configure")}`,
       "",
-      `When asked "Customize OAuth scopes?", answer yes, then select ${em("access:write")}`,
+      `When asked "Customize OAuth scopes?", answer yes, then select ${em("access.write")}`,
       "(space to toggle, enter to confirm — keep the preselected defaults).",
     );
   }

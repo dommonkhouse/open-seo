@@ -87,7 +87,7 @@ const makeResources = (stage: string) => {
       name: prod ? PROD_NAMES.d1 : `open-seo-db-${stage}`,
       // drizzle-generated SQL migrations; tracked in the same
       // wrangler-compatible table prod already uses.
-      migrations: { dir: "drizzle", table: "d1_migrations" },
+      migrations: { dir: "drizzle-flat", table: "d1_migrations" },
     }).pipe(keep),
     R2: Cloudflare.R2.Bucket("R2", {
       name: prod ? PROD_NAMES.r2 : `open-seo-r2-${stage}`,
@@ -125,11 +125,11 @@ const makeHyperdrive = () =>
   Cloudflare.Hyperdrive.Connection("HYPERDRIVE", {
     name: PROD_NAMES.hyperdrive,
     origin: Config.all([
-      Config.string("HYPERDRIVE_ORIGIN_HOST"),
-      Config.string("HYPERDRIVE_ORIGIN_PORT").pipe(Config.withDefault("5432")),
-      Config.string("HYPERDRIVE_ORIGIN_DATABASE"),
-      Config.string("HYPERDRIVE_ORIGIN_USER"),
-      Config.redacted("HYPERDRIVE_ORIGIN_PASSWORD"),
+      Config.String("HYPERDRIVE_ORIGIN_HOST"),
+      Config.String("HYPERDRIVE_ORIGIN_PORT").pipe(Config.withDefault("5432")),
+      Config.String("HYPERDRIVE_ORIGIN_DATABASE"),
+      Config.String("HYPERDRIVE_ORIGIN_USER"),
+      Config.Redacted("HYPERDRIVE_ORIGIN_PASSWORD"),
     ]).pipe(
       Config.map(([host, port, database, user, password]) => ({
         scheme: "postgres" as const,
@@ -146,16 +146,16 @@ const makeHyperdrive = () =>
   }).pipe(Alchemy.RemovalPolicy.retain());
 
 const optionalVar = (name: string) =>
-  Config.string(name).pipe(
+  Config.String(name).pipe(
     Config.withDefault(""),
     Config.map((value) => value.trim()),
   );
 
 const optionalSecret = (name: string) =>
-  Config.redacted(name).pipe(Config.withDefault(Redacted.make("")));
+  Config.Redacted(name).pipe(Config.withDefault(Redacted.make("")));
 
 const accessScopeHint =
-  " (if this is a permissions error, re-run `pnpm alchemy login --configure`, answer yes to “Customize OAuth scopes?”, and select access:write alongside the defaults)";
+  " (if this is a permissions error, re-run `pnpm alchemy login --configure`, answer yes to “Customize OAuth scopes?”, and select access.write alongside the defaults)";
 
 /**
  * Self-host auth (AUTH_MODE=cloudflare_access): derive the Access values
@@ -261,7 +261,7 @@ const resolveSelfHostAccess = (
 const dataEnv = {
   // AUTH_MODE, DATABASE_PROVIDER, BETTER_AUTH_URL, TEAM_DOMAIN, and
   // POLICY_AUD are stage-dependent and set in the stack body below.
-  DATAFORSEO_API_KEY: Config.redacted("DATAFORSEO_API_KEY"),
+  DATAFORSEO_API_KEY: Config.Redacted("DATAFORSEO_API_KEY"),
   BYPASS_EMAIL_VERIFICATION: optionalVar("BYPASS_EMAIL_VERIFICATION"),
   BETTER_AUTH_SECRET: optionalSecret("BETTER_AUTH_SECRET"),
   GOOGLE_CLIENT_ID: optionalVar("GOOGLE_CLIENT_ID"),
@@ -302,7 +302,7 @@ export default Alchemy.Stack(
     // Fail closed: an unset AUTH_MODE gets the Access-gated mode (matching the
     // app's own default in src/lib/auth-mode.ts), never public hosted signup.
     // hosted/local_noauth must be set explicitly.
-    const authMode = yield* Config.string("AUTH_MODE").pipe(
+    const authMode = yield* Config.String("AUTH_MODE").pipe(
       Config.withDefault("cloudflare_access"),
     );
     const databaseProvider = yield* optionalVar("DATABASE_PROVIDER");

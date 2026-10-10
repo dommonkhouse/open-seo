@@ -29,7 +29,7 @@ Alchemy manages Cloudflare credentials itself — nothing credential-shaped goes
 in the env files.
 
 - **Locally**, run `pnpm alchemy login` once. Answer yes to
-  **Customize OAuth scopes?** and enable `access:write` on top of the defaults
+  **Customize OAuth scopes?** and enable `access.write` on top of the defaults
   (the preview Access gate needs it; add `query_cache:write` too if you will
   deploy production — Hyperdrive). The credential is stored globally, and
   later runs — including non-interactive ones — reuse it silently.
