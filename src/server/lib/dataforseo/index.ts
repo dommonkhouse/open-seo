@@ -28,11 +28,21 @@ export {
 
 export { normalizeBacklinksTarget } from "@/server/lib/dataforseoBacklinksTarget";
 
+// Free task collection and goto conversion stay lazy to keep the SDK outside
+// the eager Worker startup graph. Neither call passes through paid metering:
+// collection is free (the task was charged at task_post) and the goto URL
+// converter is free ($0).
 /** Lazy wrapper for the one section fetcher called outside the metered client
  * (rank-check task collection is free at DataForSEO, so it skips metering). */
 export const fetchRankCheckTaskResult: DataforseoSections["fetchRankCheckTaskResult"] =
   async (input) =>
     (await loadDataforseoSections()).fetchRankCheckTaskResult(input);
+export const resolveGotoUrls: DataforseoSections["resolveGotoUrls"] = async (
+  urls,
+) => (await loadDataforseoSections()).resolveGotoUrls(urls);
+// DataForSEO's limit for one goto_url_converter request. Local constant: a
+// value re-export from a section file would drag the SDK into the eager graph.
+export const MAX_GOTO_URLS_PER_REQUEST = 100;
 
 export type {
   LabsKeywordDataItem,
