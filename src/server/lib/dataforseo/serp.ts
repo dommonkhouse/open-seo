@@ -7,6 +7,7 @@ import {
   SerpGoogleOrganicTaskPostRequestInfo,
 } from "dataforseo-client";
 import { serpApi } from "@/server/lib/dataforseo/core";
+import { isGoogleRedirect } from "@/shared/google-serp-url";
 import { MAX_TASKS_PER_POST } from "@/server/lib/dataforseo/shared";
 import {
   assertOk,
@@ -92,18 +93,6 @@ function unwrapGoogleRedirect<
 >(item: T): T & { domain?: string | null } {
   if (!item.url || !isGoogleRedirect(item.url)) return item;
   return { ...item, domain: breadcrumbHost(item.breadcrumb) };
-}
-
-function isGoogleRedirect(url: string): boolean {
-  try {
-    const parsed = new URL(url);
-    return (
-      parsed.pathname === "/goto" &&
-      /^(www\.)?google\.[a-z.]+$/.test(parsed.hostname)
-    );
-  } catch {
-    return false;
-  }
 }
 
 function breadcrumbHost(breadcrumb: string | null | undefined): string | null {

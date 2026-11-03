@@ -28,6 +28,8 @@ import {
   getKeywordHistory,
   getConfigTrend,
   getPositionMatrix,
+  updateSnapshotUrls,
+  getSnapshotsForRun,
 } from "./snapshotQueries";
 
 // ---------------------------------------------------------------------------
@@ -298,10 +300,6 @@ async function insertSnapshots(
   );
 }
 
-async function getSnapshotsForRun(runId: string) {
-  return db.select().from(rankSnapshots).where(eq(rankSnapshots.runId, runId));
-}
-
 // ---------------------------------------------------------------------------
 // Tracking keywords per config
 // ---------------------------------------------------------------------------
@@ -478,6 +476,7 @@ export const RankTrackingRepository = {
   getLatestRunForConfig,
   getActiveRunForConfig,
   insertSnapshots,
+  updateSnapshotUrls,
   getSnapshotsForRun,
   getKeywordsForConfig,
   addKeywordsToConfig,

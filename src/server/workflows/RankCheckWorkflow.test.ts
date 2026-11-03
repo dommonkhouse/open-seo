@@ -10,6 +10,10 @@ const mocks = vi.hoisted(() => ({
   getRunById: vi.fn(),
   getKeywordsForConfig: vi.fn(),
   updateRun: vi.fn(),
+  updateConfig: vi.fn(),
+  getSnapshotsForRun: vi.fn(),
+  updateSnapshotUrls: vi.fn(),
+  resolveGotoUrls: vi.fn(),
   autumnCheck: vi.fn(),
   createDataforseoClient: vi.fn(),
   runLiveCheck: vi.fn(),
@@ -46,6 +50,8 @@ vi.mock("@/server/workflows/pgStep", () => ({
 }));
 vi.mock("@/server/lib/dataforseo", () => ({
   createDataforseoClient: mocks.createDataforseoClient,
+  MAX_GOTO_URLS_PER_REQUEST: 2,
+  resolveGotoUrls: mocks.resolveGotoUrls,
 }));
 vi.mock("@/server/lib/posthog", () => ({
   captureServerEvent: mocks.captureServerEvent,
@@ -159,5 +165,113 @@ describe("rank check workflow credit ceiling", () => {
 
     expect(result.keywords).toHaveLength(5);
     expect(mocks.autumnCheck).not.toHaveBeenCalled();
+  });
+});
+
+const gotoUrl = (id: number) => `https://google.com/goto?url=${id}`;
+
+const keywords = (count: number) =>
+  Array.from({ length: count }, (_, index) => ({
+    id: `kw_${index}`,
+    keyword: `keyword ${index}`,
+  }));
+
+async function runWorkflow({
+  trigger = "scheduled",
+}: { trigger?: "scheduled" | "manual" } = {}) {
+  // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- the mocked base class does not inspect Worker constructor context
+  const workflow = new RankCheckWorkflow({} as ExecutionContext, {} as Env);
+
+  await workflow.run(
+    {
+      instanceId: "run_1",
+      timestamp: new Date(),
+      payload: {
+        runId: "run_1",
+        configId: "config_1",
+        billingCustomer,
+        projectId: "project_1",
+        domain: "example.com",
+        locationCode: 2840,
+        languageCode: "en",
+        devices: "desktop",
+        serpDepth: 10,
+        trigger,
+        maxCostCredits: 12,
+      },
+    },
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- workflow steps are executed directly by the pgStep mock
+    {} as WorkflowStep,
+  );
+}
+
+describe("rank check goto URLs", () => {
+  const gotoSnapshot = (id: number) => ({
+    id,
+    trackingKeywordId: `kw_${id}`,
+    device: "desktop",
+    url: gotoUrl(id),
+  });
+
+  beforeEach(() => {
+    mocks.getConfigById.mockResolvedValue({ isActive: true });
+    mocks.getRunById.mockResolvedValue({ ...activeRun, keywordsTotal: 1 });
+    mocks.getKeywordsForConfig.mockResolvedValue(keywords(1));
+    mocks.updateRun.mockResolvedValue(undefined);
+    mocks.isHostedServerAuthMode.mockResolvedValue(true);
+    mocks.autumnCheck.mockResolvedValue({ balance: { remaining: 1_000 } });
+    mocks.resolveGotoUrls.mockResolvedValue(new Map());
+  });
+
+  it("saves the real page for a goto result, without Google's srsltid", async () => {
+    mocks.getSnapshotsForRun.mockResolvedValue([
+      gotoSnapshot(1),
+      { ...gotoSnapshot(2), url: "https://example.com/direct" },
+      { ...gotoSnapshot(3), position: null, url: null },
+    ]);
+    mocks.resolveGotoUrls.mockResolvedValue(
+      new Map([[gotoUrl(1), "https://example.com/page?id=1&srsltid=abc"]]),
+    );
+
+    await runWorkflow({});
+
+    expect(mocks.resolveGotoUrls).toHaveBeenCalledExactlyOnceWith([gotoUrl(1)]);
+    expect(mocks.updateSnapshotUrls).toHaveBeenCalledExactlyOnceWith([
+      { id: 1, url: "https://example.com/page?id=1" },
+    ]);
+  });
+
+  it("keeps a goto link the converter can't resolve", async () => {
+    mocks.getSnapshotsForRun.mockResolvedValue([gotoSnapshot(1)]);
+
+    await runWorkflow({});
+
+    expect(mocks.updateSnapshotUrls).toHaveBeenCalledExactlyOnceWith([]);
+  });
+
+  it("splits a large run across converter requests", async () => {
+    mocks.getSnapshotsForRun.mockResolvedValue(
+      [1, 2, 3].map((id) => gotoSnapshot(id)),
+    );
+
+    await runWorkflow({});
+
+    expect(mocks.resolveGotoUrls.mock.calls).toEqual([
+      [[gotoUrl(1), gotoUrl(2)]],
+      [[gotoUrl(3)]],
+    ]);
+  });
+
+  it("still finishes the run when the converter fails", async () => {
+    mocks.getSnapshotsForRun.mockResolvedValue([gotoSnapshot(1)]);
+    mocks.resolveGotoUrls.mockRejectedValue(new Error("converter down"));
+
+    await runWorkflow({});
+
+    expect(mocks.updateSnapshotUrls).not.toHaveBeenCalled();
+    expect(mocks.updateRun).toHaveBeenCalledWith(
+      "run_1",
+      expect.objectContaining({ status: "completed", keywordsChecked: 1 }),
+    );
   });
 });

@@ -12,6 +12,7 @@ import {
   sql,
 } from "drizzle-orm";
 import { db } from "@/db";
+import { executeInBatches } from "@/db/runBatch";
 import { rankCheckRuns, rankSnapshots } from "@/db/schema";
 import { toSqliteTimestamp } from "@/server/features/rank-tracking/rankTrackingTimestamps";
 
@@ -279,4 +280,20 @@ export async function getEarliestSnapshotsForKeywords(
   }
 
   return allResults;
+}
+
+/** Replace google.com/goto snapshot URLs with their resolved pages. */
+export async function updateSnapshotUrls(
+  updates: Array<{ id: number; url: string }>,
+) {
+  await executeInBatches(updates, (tx, update) =>
+    tx
+      .update(rankSnapshots)
+      .set({ url: update.url })
+      .where(eq(rankSnapshots.id, update.id)),
+  );
+}
+
+export function getSnapshotsForRun(runId: string) {
+  return db.select().from(rankSnapshots).where(eq(rankSnapshots.runId, runId));
 }

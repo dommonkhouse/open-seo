@@ -45,6 +45,8 @@ export {
 
 export { fetchLighthouseResult } from "@/server/lib/dataforseo/lighthouse";
 
+export { resolveGotoUrls } from "@/server/lib/dataforseo/appendix";
+
 export {
   fetchLlmAggregatedMetrics,
   fetchLlmCrossAggregatedMetrics,

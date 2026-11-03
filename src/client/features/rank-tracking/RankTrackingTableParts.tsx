@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { buildCsv, downloadCsv } from "@/client/lib/csv";
 import { exportTableToSheets } from "@/client/lib/exportToSheets";
 import { captureClientEvent } from "@/client/lib/posthog";
+import { isGoogleRedirect } from "@/shared/google-serp-url";
 import { formatLocationLabel } from "@/shared/keyword-locations";
 import type {
   RankTrackingDeviceResult,
@@ -116,9 +117,24 @@ export function DeviceUrlCell({
   if (!result.rankingUrl) {
     return <span className="text-base-content/40 text-xs">-</span>;
   }
+  const href = toFullUrl(result.rankingUrl, domain);
+  // Until a run resolves them, Google's goto links have no useful path to show.
+  if (isGoogleRedirect(result.rankingUrl)) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Google hid this page's address."
+        className="link link-hover block w-fit text-xs"
+      >
+        View page
+      </a>
+    );
+  }
   return (
     <a
-      href={toFullUrl(result.rankingUrl, domain)}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       className="link link-hover block truncate text-xs"
