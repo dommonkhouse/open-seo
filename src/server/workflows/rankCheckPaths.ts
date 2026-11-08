@@ -152,8 +152,10 @@ export async function runLiveCheck(
 
 // Poll cadence for queued tasks. Standard-priority tasks complete in ~5
 // minutes on average, so the first check waits 4 minutes; cumulative waits are
-// 4 / 6 / 8 / 10 / 12 / 15 minutes, after which stragglers fall back to the
-// live endpoint.
+// 4 / 6 / 8 / 10 / 12 / 15 / 30 / 45 / 60 minutes. Keep collecting slow queued
+// tasks for an hour before stragglers fall back to the live endpoint. Append
+// only: changing an earlier wait's name or duration would change replayed
+// results for workflows started by an older Worker version.
 const QUEUED_POLL_INTERVALS = [
   "4 minutes",
   "2 minutes",
@@ -161,6 +163,9 @@ const QUEUED_POLL_INTERVALS = [
   "2 minutes",
   "2 minutes",
   "3 minutes",
+  "15 minutes",
+  "15 minutes",
+  "15 minutes",
 ] as const;
 
 /** Concurrent task_get requests within a collect step. */
@@ -265,7 +270,7 @@ export interface QueuedCheckStats {
 /**
  * Check keywords via DataForSEO's standard task queue (~30% of live cost).
  * Posts every keyword/device pair as a queued task, then polls task_get for
- * ~15 minutes, writing snapshots incrementally as tasks complete. Anything
+ * up to an hour of waits, writing snapshots incrementally as tasks complete. Anything
  * still unfinished after the polling window — plus tasks DataForSEO rejected
  * or failed — gets one shot at the live endpoint so a run never hangs on a
  * stuck queue. Billing happens at task_post (and per live-fallback call).
@@ -327,7 +332,7 @@ export async function runQueuedCheck(
     fallbackChecked: 0,
   };
 
-  // Poll until everything is collected or the ~15 minute window closes. A
+  // Poll until everything is collected or the hour of waits is exhausted. A
   // collect failure (past its retries) leaves that round's tasks pending for
   // the next round — or the live fallback — instead of failing the run; the
   // posted tasks are already paid for.
