@@ -13,11 +13,12 @@ import {
 // admitted, so a config bigger than the budget (legal max: 1,000 keywords ×
 // 2 devices = 2,000 units) can never starve. Sized against DataForSEO's
 // 2,000 requests/min account cap, where task_get polling is the binding
-// term: one call per unit per poll round, rounds wake synchronized per tick,
-// and up to three ticks' ~15-minute poll windows overlap the */5 cron — so a
-// full tick can burst ~1,000 polls into a single minute, stacking with the
-// residual rounds of the two prior ticks. Overruns aren't
-// loud failures: throttled polls age into the live fallback at ~3× cost,
+// term: one call per unit per poll round, rounds wake synchronized per tick.
+// Poll windows can now extend to 60 minutes, so residual rounds from up to 12
+// ticks may overlap the */5 cron during sustained backlog catch-up. This
+// admission budget bounds new work per tick, not the aggregate polling rate;
+// long-lived runs need their own observed polling load kept below the cap.
+// Overruns aren't loud failures: throttled polls age into the live fallback at ~3× cost,
 // billed to the customer, so keep real headroom under the cap.
 // 1,000/tick ≈ 288,000 units/day, ~45× steady-state demand — it only binds
 // during backlog catch-up.
