@@ -1,6 +1,6 @@
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { member, organization, user as authUser } from "@/db/schema";
+import { account, member, organization, user as authUser } from "@/db/schema";
 
 type DelegatedOrganizationInput = {
   id: string;
@@ -50,7 +50,15 @@ async function getHostedUser(userId: string) {
   });
 }
 
+async function findOAuthAccounts(userId: string, providerId: string) {
+  return db
+    .select({ id: account.id, accountId: account.accountId })
+    .from(account)
+    .where(and(eq(account.userId, userId), eq(account.providerId, providerId)));
+}
+
 export const AuthRepository = {
+  findOAuthAccounts,
   upsertDelegatedOrganization,
   findFirstOrganizationIdForUser,
   getHostedUser,

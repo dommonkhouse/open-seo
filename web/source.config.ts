@@ -3,7 +3,7 @@ import {
   defineCollections,
   frontmatterSchema,
   metaSchema,
-} from "fumadocs-mdx/config/zod-3";
+} from "fumadocs-mdx/config";
 import { z } from "zod";
 
 const pageSchema = frontmatterSchema as any;

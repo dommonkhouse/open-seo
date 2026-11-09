@@ -37,8 +37,8 @@ export async function startGoogleLink(
       return;
     }
 
-    const res = await authClient.oauth2.link({
-      providerId: config.providerId,
+    const res = await authClient.linkSocial({
+      provider: config.providerId,
       callbackURL,
     });
     if (res.error) {

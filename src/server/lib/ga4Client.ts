@@ -1,6 +1,6 @@
 /* eslint-disable max-lines -- one client module per Google integration (gscClient precedent); GA4 spans the Admin and Data APIs */
 import { z } from "zod";
-import { getAuth } from "@/lib/auth";
+import { getOAuthAccessToken } from "@/server/auth/oauth-access-token";
 import {
   Ga4AdminApiError,
   Ga4DataApiError,
@@ -129,13 +129,11 @@ async function getGa4AccessToken(opts: {
 }): Promise<string> {
   let result: { accessToken?: string } | undefined;
   try {
-    result = await getAuth().api.getAccessToken({
-      body: {
-        providerId: GA4_OAUTH_PROVIDER_ID,
-        userId: opts.userId,
-        accountId: opts.ga4AccountId,
-      },
-    });
+    result = await getOAuthAccessToken(
+      opts.userId,
+      GA4_OAUTH_PROVIDER_ID,
+      opts.ga4AccountId,
+    );
   } catch (error) {
     throw new Ga4TokenError(
       "Could not mint a Google Analytics access token.",

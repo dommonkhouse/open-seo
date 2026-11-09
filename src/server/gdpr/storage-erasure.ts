@@ -1,4 +1,4 @@
-import { getAuth } from "@/lib/auth";
+import { getOAuthAccessToken } from "@/server/auth/oauth-access-token";
 import { getAuditScratchpad } from "@/server/features/audit/AuditScratchpad";
 import type { OnboardingChatAgent } from "@/server/features/onboarding/OnboardingChatAgent";
 import type { SamChatAgent } from "@/server/features/sam/SamChatAgent";
@@ -139,13 +139,11 @@ async function revokeGoogleAccount(
 ): Promise<GoogleRevocationResult> {
   let accessToken: string | undefined;
   try {
-    const result = await getAuth().api.getAccessToken({
-      body: {
-        userId,
-        providerId: account.providerId,
-        accountId: account.accountId,
-      },
-    });
+    const result = await getOAuthAccessToken(
+      userId,
+      account.providerId,
+      account.accountId,
+    );
     accessToken = result?.accessToken;
   } catch {
     // If Better Auth cannot mint a token, the locally stored grant is no longer
