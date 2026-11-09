@@ -18,12 +18,10 @@ vi.mock("@/lib/auth", () => ({
 
 vi.mock("@/server/auth/repositories/AuthRepository", () => ({
   AuthRepository: {
-    findOAuthAccounts: vi
-      .fn()
-      .mockResolvedValue([
-        { id: "ga4-row-a", accountId: "google-sub-a" },
-        { id: "ga4-row-1", accountId: "account_1" },
-      ]),
+    findOAuthAccounts: vi.fn().mockResolvedValue([
+      { id: "ga4-row-a", accountId: "google-sub-a" },
+      { id: "ga4-row-1", accountId: "account_1" },
+    ]),
   },
 }));
 
