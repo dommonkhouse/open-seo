@@ -72,10 +72,27 @@ if (!process.env.CLOUDFLARE_API_TOKEN) {
     cloudflare = undefined;
   }
   if (!cloudflare) {
-    fail(
-      `No Cloudflare login found (alchemy profile "${profileName}") — run ${cmd("pnpm alchemy login")}`,
-      `first (answer yes to "Customize OAuth scopes?" and enable ${em("access.write")}).`,
+    // alchemy >= beta.79 stores one JSON document per provider under
+    // ~/.alchemy/profiles/<name>/<provider>.json instead of profiles.json.
+    // Fall back to that file and surface a helpful error if neither exists.
+    const perProvider = path.join(
+      homedir(),
+      ".alchemy",
+      "profiles",
+      profileName,
+      "cloudflare.json",
     );
+    try {
+      cloudflare = JSON.parse(readFileSync(perProvider, "utf8")).values;
+    } catch {
+      cloudflare = undefined;
+    }
+    if (!cloudflare) {
+      fail(
+        `No Cloudflare login found (alchemy profile "${profileName}") — run ${cmd("pnpm alchemy login")}`,
+        `first (answer yes to "Customize OAuth scopes?" and enable ${em("access.write")}).`,
+      );
+    }
   }
   if (
     managedAccess &&
