@@ -9,6 +9,14 @@ vi.mock("@/lib/auth", () => ({
   getAuth: () => ({ api: { getAccessToken: mocks.getAccessToken } }),
 }));
 
+vi.mock("@/server/auth/repositories/AuthRepository", () => ({
+  AuthRepository: {
+    findOAuthAccounts: vi
+      .fn()
+      .mockResolvedValue([{ id: "gsc-row-a", accountId: "google-sub-a" }]),
+  },
+}));
+
 function jsonResponse(body: unknown, status = 200) {
   return Response.json(body, { status });
 }
@@ -50,21 +58,20 @@ describe("gscClient", () => {
 
     expect(mocks.getAccessToken).toHaveBeenCalledWith({
       body: {
-        providerId: "google-search-console",
         userId: "u1",
-        accountId: "google-sub-a",
+        accountId: "gsc-row-a",
       },
     });
   });
 
-  it("omits accountId for the legacy null-account fallback", async () => {
+  it("resolves the single account for the legacy null-account fallback", async () => {
     mocks.fetch.mockResolvedValue(jsonResponse({ siteEntry: [] }));
     const { createGscClient } = await import("./gscClient");
 
     await createGscClient({ userId: "u1" }).listSites();
 
     expect(mocks.getAccessToken).toHaveBeenCalledWith({
-      body: { providerId: "google-search-console", userId: "u1" },
+      body: { accountId: "gsc-row-a", userId: "u1" },
     });
   });
 

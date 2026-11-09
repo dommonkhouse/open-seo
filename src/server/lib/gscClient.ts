@@ -1,4 +1,4 @@
-import { getAuth } from "@/lib/auth";
+import { getOAuthAccessToken } from "@/server/auth/oauth-access-token";
 import { GSC_OAUTH_PROVIDER_ID } from "@/shared/gsc";
 import { GscApiError, GscTokenError } from "./gscErrors";
 
@@ -91,13 +91,11 @@ export function createGscClient(opts: {
       // session is present, and auto-refreshes via the genericOAuth provider.
       // Works in every auth mode — self-hosted builds the same Better Auth
       // instance once BETTER_AUTH_SECRET is set.
-      result = await getAuth().api.getAccessToken({
-        body: {
-          providerId: GSC_OAUTH_PROVIDER_ID,
-          userId: opts.userId,
-          ...(opts.gscAccountId ? { accountId: opts.gscAccountId } : {}),
-        },
-      });
+      result = await getOAuthAccessToken(
+        opts.userId,
+        GSC_OAUTH_PROVIDER_ID,
+        opts.gscAccountId,
+      );
     } catch (error) {
       throw new GscTokenError(
         "Could not mint a Search Console access token (grant revoked or expired).",

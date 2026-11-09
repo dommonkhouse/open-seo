@@ -16,6 +16,17 @@ vi.mock("@/lib/auth", () => ({
   getAuth: () => ({ api: { getAccessToken: mocks.getAccessToken } }),
 }));
 
+vi.mock("@/server/auth/repositories/AuthRepository", () => ({
+  AuthRepository: {
+    findOAuthAccounts: vi
+      .fn()
+      .mockResolvedValue([
+        { id: "ga4-row-a", accountId: "google-sub-a" },
+        { id: "ga4-row-1", accountId: "account_1" },
+      ]),
+  },
+}));
+
 function jsonResponse(body: unknown, status = 200) {
   return Response.json(body, { status });
 }
@@ -82,9 +93,8 @@ describe("ga4Client admin API", () => {
     ]);
     expect(mocks.getAccessToken).toHaveBeenCalledWith({
       body: {
-        providerId: "google-analytics",
         userId: "u1",
-        accountId: "google-sub-a",
+        accountId: "ga4-row-a",
       },
     });
     const secondUrl = mocks.fetch.mock.calls[1]?.[0];
@@ -290,9 +300,8 @@ describe("ga4Client data API", () => {
     expect(result.rowCount).toBe(1);
     expect(mocks.getAccessToken).toHaveBeenCalledWith({
       body: {
-        providerId: "google-analytics",
         userId: "user_1",
-        accountId: "account_1",
+        accountId: "ga4-row-1",
       },
     });
     expect(mocks.fetch).toHaveBeenCalledWith(
