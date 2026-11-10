@@ -13,11 +13,11 @@ The standing production rule still requires Dominic's explicit `$ad-review <abso
 - [x] Apply the original queue-collection patch and first upstream redirect-credit patch.
 - [x] Resolve the second upstream patch against the older source structure and validate the local combined code.
 - [x] Complete independent ordinary code review and commit the resolved second cherry-pick.
-- [ ] Complete the explicitly invoked production approach review and resolve any findings.
-- [ ] Verify existing deployment credentials/resources and a safe idle deployment window without creating or rotating credentials.
-- [ ] Deploy the reviewed branch exactly once through the existing self-host deployment route.
-- [ ] Record deployment GMT time, active Worker version and included commits; verify application availability without creating a rank task.
-- [ ] Read tomorrow's natural scheduled check and the next applicable Mini report for production recovery proof.
+- [x] Complete the explicitly invoked production approach review and resolve any findings.
+- [x] Verify existing deployment credentials/resources and a safe idle deployment window without creating or rotating credentials. (9 Nov: preflight exit 0 against the stored-token profile after the per-provider-path fix; workflow instance lists showed only completed runs, no active rank task; no credential created, copied or rotated.)
+- [x] Deploy the reviewed branch exactly once through the existing self-host deployment route. (9 Nov 08:37:41Z, `pnpm deploy:selfhost --yes`, exit 0, one run.)
+- [x] Record deployment GMT time, active Worker version and included commits; verify application availability without creating a rank task. (Version ae9d608e at 100%, deployment 64166367; commits c2e27a03/344e739f/a2e73e11 over 5218f86e; worker URL answers under the Access 401 gate; receipt outputs/2026-11-09/openseo-live-deploy-receipt.md and MON-1172 comment.)
+- [ ] Read tomorrow's natural scheduled check and the next applicable Mini report for production recovery proof. (Timeline: the 10 Nov 07:15Z tracker run is the first post-deploy run; the 10 Nov 05:30 report still reads the 9 Nov pre-deploy run, so the clean-report proof lands with the 11 Nov 05:30 report. Scheduled checks cover both.)
 
 ## Evidence and boundaries
 
